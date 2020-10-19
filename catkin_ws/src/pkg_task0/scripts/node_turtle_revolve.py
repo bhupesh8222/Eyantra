@@ -1,50 +1,52 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg  import Twist
 from turtlesim.msg import Pose
 
+rospy.init_node('node_turtle_revolve', anonymous=True)
 
-def main():
-    
-    velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
-    
-    rospy.init_node('turtle_revolve', anonymous=True)
-    
-    var_loop_rate = rospy.Rate(1)
+pose = Pose()
+rate = rospy.Rate(50)
 
-    condition = True
-        
-    while not rospy.is_shutdown() and condition:
-        
-        vel_msg = Twist()
-        vel_msg.linear.x = 1
-        vel_msg.linear.y = 0
-        vel_msg.angular.z = 0.5
+def callback(data):
+    global pose
+    pose = data
     
-        rospy.loginfo("Publishing: ")
     
-        velocity_publisher.publish(vel_msg)
+velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
+pose_subscriber = rospy.Subscriber('/turtle1/pose', Pose, callback)
+
+def MakeACircularRound():
         
+    radius = 2
+    frequency = 0.1
+                
+    goal_pose = Pose()
+    vel_msg = Twist()
+    rate.sleep()
+    StartTime = float(rospy.Time.now().to_sec())
+    distance = 0
         
-        def pose_callback(msg):
-            rospy.loginfo(msg.theta)
-            if msg.theta==float(0):
-                global condition 
-                rospy.loginfo("MSG.THETA IS ZERO")
-                condition= False               
             
-               
-        rospy.Subscriber("/turtle1/pose", Pose, pose_callback)
-
-        var_loop_rate.sleep()
+    while (2*3.1416*radius) >= distance and not rospy.is_shutdown():
         
-
-        rospy.loginfo(condition)
-
+        vel_msg.linear.x = 2*3.1416*frequency*radius
        
-if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+        vel_msg.angular.z = 2*3.1416*frequency
+        
+        FinishTime=float(rospy.Time.now().to_sec())
+        distance = vel_msg.linear.x * (FinishTime-StartTime)
+                                 
+        velocity_publisher.publish(vel_msg)
+        rospy.loginfo("Moving in a circle")
+        rate.sleep()
+            
+        
+    vel_msg.linear.x = 0
+    vel_msg.angular.z =0
+    velocity_publisher.publish(vel_msg)
+    rospy.loginfo("Goal reached")
+
+MakeACircularRound()
+      
