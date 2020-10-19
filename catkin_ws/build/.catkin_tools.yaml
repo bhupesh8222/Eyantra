@@ -1,0 +1,6 @@
+devel_space: /home/bhupesh/catkin_ws/devel
+install: false
+install_space: /home/bhupesh/catkin_ws/install
+profile: default
+source_space: /home/bhupesh/catkin_ws/src
+workspace: /home/bhupesh/catkin_ws
