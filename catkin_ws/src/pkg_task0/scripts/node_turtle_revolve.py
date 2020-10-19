@@ -4,6 +4,7 @@ import rospy
 from geometry_msgs.msg  import Twist
 from turtlesim.msg import Pose
 
+#our node
 rospy.init_node('node_turtle_revolve', anonymous=True)
 
 pose = Pose()
@@ -13,7 +14,7 @@ def callback(data):
     global pose
     pose = data
     
-    
+#publishing over topic and subscribing to pose.
 velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
 pose_subscriber = rospy.Subscriber('/turtle1/pose', Pose, callback)
 
@@ -36,8 +37,11 @@ def MakeACircularRound():
         vel_msg.angular.z = 2*3.1416*frequency
         
         FinishTime=float(rospy.Time.now().to_sec())
+        
+        #distance in circular path = time * speed
         distance = vel_msg.linear.x * (FinishTime-StartTime)
-                                 
+
+        #publishing our message                        
         velocity_publisher.publish(vel_msg)
         rospy.loginfo("Moving in a circle")
         rate.sleep()
